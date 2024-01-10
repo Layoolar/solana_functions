@@ -25,7 +25,9 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
+        "@solana/spl-token": "^0.3.10",
         "@solana/web3.js": "^1.87.6",
+        "bs58": "^5.0.0",
         "lowdb": "^1.0.0",
         "nodemon": "^3.0.2",
         "ts-node": "^10.9.2"

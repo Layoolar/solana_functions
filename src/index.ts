@@ -1,21 +1,42 @@
 import * as solana from "@solana/web3.js"
 import { createWallet } from "./wallet"
-import { sendTrasaction } from "./transactions"
-// import db from "./db/db.js"
-
-// const testPubKey = "Cs6ehAgrEHeMXZtj1Qf6zKk1HGGneSeVtfjqoAmwNiyr" as solana.PublicKey
-
-// const keyPair: {publicKey: solana.PublicKey, secretKey: solana.Ed25519SecretKey} = {publicKey: }
+import bs58 from "bs58"
+import {
+    sendTrasaction,
+    requestAirdrop,
+    mintToken,
+    sendSplToken,
+} from "./transactions"
+import db from "./db/db"
 
 const testTransaction = async () => {
-    const connection = new solana.Connection(
-        "https://nd-378-985-855.p2pify.com/aa2c0d8f21771e666e2e1aebcba552b2"
-    )
-    let publicKey = solana.Keypair.generate()
+    // const connection = new solana.Connection(
+    //     "https://nd-666-486-702.p2pify.com/a152a989afaaff2af9bcf29bfef11523",
+    //     {
+    //         wsEndpoint:
+    //             "wss://ws-nd-666-486-702.p2pify.com/a152a989afaaff2af9bcf29bfef11523",
+    //     }
+    // )
+    // Use connection below for minting and airdrop
+    const connection = new solana.Connection(solana.clusterApiUrl("devnet"), {
+        commitment: "confirmed",
+    })
+    let publicKey = db.wallets.get("wallets").value()[1].Keypair
+    const Keypair = db.wallets.get("wallets").value()[1].Keypair
 
-    const keyPair = await createWallet(connection)
+    let secretKey = Object.values(Keypair.secretKey)
+    const uintSecretKey = new Uint8Array(secretKey)
+    const wallet = solana.Keypair.fromSecretKey(uintSecretKey)
+    // console.log(bs58.encode(wallet.secretKey))
+    // await requestAirdrop(connection, wallet.publicKey)
+    // await mintToken(connection, wallet)
 
-    sendTrasaction(connection, keyPair, publicKey.publicKey, 10)
+    // let balance = await connection.getBalance(wallet.publicKey)
+    // console.log(balance / solana.LAMPORTS_PER_SOL)
+
+    // const wallet = await createWallet(connection)
+
+    // await sendTrasaction(connection, wallet, publicKey.publicKey, 0.5)
 }
 
 testTransaction()

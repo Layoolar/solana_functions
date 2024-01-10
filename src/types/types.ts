@@ -3,5 +3,5 @@ export interface connectionParameter {}
 
 export interface walletData {
     userId: number
-    keyPair: solana.Keypair
+    Keypair: { publicKey: solana.PublicKey; secretKey: Uint8Array }
 }
