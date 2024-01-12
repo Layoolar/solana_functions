@@ -2,7 +2,7 @@ import * as solana from "@solana/web3.js"
 import { createWallet } from "./wallet"
 import bs58 from "bs58"
 import {
-    sendTrasaction,
+    sendSolTrasaction,
     requestAirdrop,
     mintToken,
     sendSplToken,
@@ -21,12 +21,14 @@ const testTransaction = async () => {
     const connection = new solana.Connection(solana.clusterApiUrl("devnet"), {
         commitment: "confirmed",
     })
-    let publicKey = db.wallets.get("wallets").value()[1].Keypair
+    let publicKey = db.wallets.get("wallets").value()[0].Keypair
+    console.log(publicKey.publicKey)
     const Keypair = db.wallets.get("wallets").value()[1].Keypair
 
     let secretKey = Object.values(Keypair.secretKey)
     const uintSecretKey = new Uint8Array(secretKey)
     const wallet = solana.Keypair.fromSecretKey(uintSecretKey)
+    const toKey = new solana.PublicKey(publicKey.publicKey)
     // console.log(bs58.encode(wallet.secretKey))
     // await requestAirdrop(connection, wallet.publicKey)
     // await mintToken(connection, wallet)
@@ -35,8 +37,9 @@ const testTransaction = async () => {
     // console.log(balance / solana.LAMPORTS_PER_SOL)
 
     // const wallet = await createWallet(connection)
+    await sendSplToken(connection, wallet, toKey, 200)
 
-    // await sendTrasaction(connection, wallet, publicKey.publicKey, 0.5)
+    // await sendSolTrasaction(connection, wallet, publicKey.publicKey, 0.5)
 }
 
 testTransaction()

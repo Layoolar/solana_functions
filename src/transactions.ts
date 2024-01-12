@@ -1,7 +1,7 @@
 import * as solana from "@solana/web3.js"
 
 // Function to send sol from one account to another
-const sendTrasaction = async (
+const sendSolTrasaction = async (
     connection: solana.Connection,
     fromKeyPair: solana.Keypair,
     toKey: solana.PublicKey,
@@ -40,14 +40,41 @@ const sendSplToken = async (
     numOfToken: number
 ) => {
     const splToken = await import("@solana/spl-token")
+    // Change mint address to that of your token
+    const mintAddress = new solana.PublicKey(
+        "4TBrL6s9wQukwLFMXscg35hX3jk11D6E7cdymhai9m4p"
+    )
+    const accountInfo = await connection.getParsedAccountInfo(mintAddress)
+    const tokenDecimals = (accountInfo.value?.data as solana.ParsedAccountData)
+        .parsed.info.decimals as number
+    const tokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
+        connection,
+        fromKeyPair,
+        mintAddress,
+        fromKeyPair.publicKey
+    )
+    const destinationAccount = await splToken.getOrCreateAssociatedTokenAccount(
+        connection,
+        fromKeyPair,
+        mintAddress,
+        toKey
+    )
     const transaction = new solana.Transaction().add(
         splToken.createTransferInstruction(
+            tokenAccount.address,
+            destinationAccount.address,
             fromKeyPair.publicKey,
-            toKey,
-            fromKeyPair.publicKey,
-            500
+            numOfToken * Math.pow(10, tokenDecimals)
         )
     )
+    const latestBlockHash = await connection.getLatestBlockhash("confirmed")
+    transaction.recentBlockhash = await latestBlockHash.blockhash
+    const signature = await solana.sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [fromKeyPair]
+    )
+    console.log("successful")
 }
 
 const mintToken = async (
@@ -66,6 +93,7 @@ const mintToken = async (
         {},
         splToken.TOKEN_PROGRAM_ID
     )
+
     console.log(1)
     const tokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
         connection,
@@ -73,7 +101,9 @@ const mintToken = async (
         mint,
         fromKeyPair.publicKey
     )
-    splToken.mintTo(
+
+    console.log(tokenAccount)
+    await splToken.mintTo(
         connection,
         fromKeyPair,
         mint,
@@ -84,4 +114,4 @@ const mintToken = async (
     // await token.mintTo
 }
 
-export { sendTrasaction, requestAirdrop, sendSplToken, mintToken }
+export { sendSolTrasaction, requestAirdrop, sendSplToken, mintToken }
