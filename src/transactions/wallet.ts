@@ -1,5 +1,5 @@
 import * as solana from "@solana/web3.js"
-import db from "./db/db"
+import db from "../db/db"
 
 const createWallet = async (connection: solana.Connection) => {
     const walletKeyPair = solana.Keypair.generate()
