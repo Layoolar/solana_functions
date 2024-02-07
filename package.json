@@ -29,6 +29,7 @@
         "@solana/spl-token": "^0.3.10",
         "@solana/web3.js": "^1.87.6",
         "bs58": "^5.0.0",
+        "dotenv": "^16.4.1",
         "lowdb": "^1.0.0",
         "nodemon": "^3.0.2",
         "ts-node": "^10.9.2"

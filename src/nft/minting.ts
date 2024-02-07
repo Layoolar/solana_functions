@@ -1,6 +1,7 @@
 import * as solana from "@solana/web3.js"
 import * as mtplx from "@metaplex-foundation/js"
-import * as fs from "fs"
+import { uploadImage, uploadMetadata } from "./utils"
+import { createNFTConfig } from "./config"
 
 const mint = async (
     connection: solana.Connection,
@@ -8,21 +9,8 @@ const mint = async (
     QUICKNODE_RPC: string
 ) => {
     console.log("starts")
-    const config = {
-        uploadPath: "",
-        imgFileName: "adebimpe.JPG",
-        imgType: "image/jpg",
-        imgName: "Adebimpe",
-        description: "Absolutely gorgeous",
-        attributes: [
-            { trait_type: "Speed", value: "Quick" },
-            { trait_type: "Type", value: "Pixelated" },
-            { trait_type: "Background", value: "QuickNode Blue" },
-        ],
-        sellerFeeBasisPoints: 500, //500 bp = 5%
-        symbol: "QNPIX",
-        creators: [{ address: fromKeyPair.publicKey, share: 100 }],
-    }
+    const config = createNFTConfig(fromKeyPair)
+    await connection.getLatestBlockhash("finalized")
 
     const metaplex = mtplx.Metaplex.make(connection)
         .use(mtplx.keypairIdentity(fromKeyPair))
@@ -48,7 +36,7 @@ const mint = async (
         config.description,
         config.attributes
     )
-    console.log("metedata upload scc")
+    console.log("metedata upload scc", metadataUri)
     mintNFT(
         metaplex,
         metadataUri,
@@ -62,38 +50,6 @@ const mint = async (
             },
         ]
     )
-}
-
-const uploadImage = async (filepath: string, metaplex: mtplx.Metaplex) => {
-    const imgBuffer = fs.readFileSync(filepath)
-    const imgMetaplexFile = mtplx.toMetaplexFile(imgBuffer, "adebimpe.JPG")
-    const imgUri = await metaplex.storage().upload(imgMetaplexFile)
-    return imgUri
-}
-
-const uploadMetadata = async (
-    metaplex: mtplx.Metaplex,
-    imgUri: string,
-    imgType: string,
-    nftName: string,
-    description: string,
-    attributes: { trait_type: string; value: string }[]
-) => {
-    const { uri } = await metaplex.nfts().uploadMetadata({
-        name: nftName,
-        description: description,
-        image: imgUri,
-        attributes: attributes,
-        properties: {
-            files: [
-                {
-                    type: imgType,
-                    uri: imgUri,
-                },
-            ],
-        },
-    })
-    return uri
 }
 
 const mintNFT = async (

@@ -42,7 +42,7 @@ const sendSplToken = async (
     const splToken = await import("@solana/spl-token")
     // Change mint address to that of your token
     const mintAddress = new solana.PublicKey(
-        "4TBrL6s9wQukwLFMXscg35hX3jk11D6E7cdymhai9m4p"
+        "4JeGKgkrwcNJMESbJp5KrnQVmQdEffwr7zhicijz2BgC"
     )
     const accountInfo = await connection.getParsedAccountInfo(mintAddress)
     const tokenDecimals = (accountInfo.value?.data as solana.ParsedAccountData)
